@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Parent Stack of Nested ones
+
+Parameters:
+  KeyName: 
+    Description: Name of an existing EC2 key pair for SSH access to the EC2 instance
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: "aamirKP1"
+
+  RoleName: 
+    Description: Role description
+    Type: "String"
+    Default: "S3AdminAccess"
+    ConstraintDescription: Must be a valid IAM Role
+    
+  InstaceTypeParam:
+    Type: "String"
+    Default: "t2.micro"
+    AllowedValues: 
+      - "t2.micro"
+      - "m3.medium"
+      - "m3.large"
+      - "c3.large"
+      - "c3.xlarge"
+    ConstraintDescription: Must be one of them
+
+
+
+Resources:
+  MyVpcStack:
+    Type: AWS::CloudFormation::Stack
+    Properties: 
+      TemplateURL: "https://cf-templates-10v3kub72h1yp-us-west-1.s3-us-west-1.amazonaws.com/VPC.yaml"
+      TimeoutInMinutes: 30
+
+
+
+
+  MyAutoScallingStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: MyLoadBalancerStack
+    Properties: 
+      TemplateURL: "https://cf-templates-10v3kub72h1yp-us-west-1.s3-us-west-1.amazonaws.com/AutoScalling.yaml"
+      TimeoutInMinutes: 30
+      Parameters: 
+        RoleName: !Ref "RoleName"
+        InstaceTypeParam: !Ref "InstaceTypeParam"
+        KeyName: !Ref "KeyName"
+
+
+  MyDbStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: MyVpcStack
+    Properties:  
+      TemplateURL: "https://cf-templates-10v3kub72h1yp-us-west-1.s3-us-west-1.amazonaws.com/DBServer.yaml"
+      TimeoutInMinutes: 30
+      Parameters: 
+        InstaceTypeParam: !Ref "InstaceTypeParam"
+        KeyName: !Ref "KeyName"
+        AZsSelection: !GetAtt "MyVpcStack.Outputs.PVSUB01r"
+        SG: !GetAtt "MyVpcStack.Outputs.DBSGr"
+
+
+  
+  MyLoadBalancerStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: MyVpcStack
+    Properties:  
+      TemplateURL: "https://cf-templates-10v3kub72h1yp-us-west-1.s3-us-west-1.amazonaws.com/AppLoadBalancer.yaml"
+      TimeoutInMinutes: 30
+
+          
+
+        

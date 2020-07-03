@@ -1,0 +1,52 @@
+#!/usr/bin/env groovy
+
+node {
+  
+  
+  stage 'Checkout'
+  git 'https://github.com/aamirshehzad111/jenkins-git.git'
+    
+ 
+  properties([
+      parameters(
+         [string(defaultValue: 'cluster-one', description: 'reference cluster name', name: 'clusterValue'),
+          string(defaultValue: ' ', description: 'vpc id', name: 'vpc'),
+          string(defaultValue: 'tg', description: 'unique target group name', name: 'targetGroup'),
+          string(defaultValue: '', description: 'subnet id', name: 'subnet1')
+          string(defaultValue: '', description: 'subnet id', name: 'subnet2')
+          
+         ] 
+      )
+
+  ])
+
+  
+  
+  stage 'Docker build'
+  sh "docker build  -t jenkins-project . --build-arg BUILD=${currentBuild.number}"
+ 
+  stage 'Docker push'
+  sh "\$(aws ecr get-login --no-include-email --region us-east-1)"
+  docker.withRegistry('https://020046395185.dkr.ecr.us-east-1.amazonaws.com/jenkins-project') {
+      docker.image('jenkins-project').push("${currentBuild.number}")
+  }
+
+  image="020046395185.dkr.ecr.us-east-1.amazonaws.com/jenkins-project"
+  tag="${currentBuild.number}"
+  taskDefImage="${image}:${tag}"
+  echo "${taskDefImage}"
+  
+
+  stage('Deploy'){
+    
+ 
+    //sh "aws ecs register-task-definition --execution-role-arn arn:aws:iam::020046395185:role/ecsTaskExecutionRole --cli-input-json file://taskdef1.json --region us-east-1"
+    withAWS(region:'us-east-1') {
+       def outputs = cfnUpdate(stack: "service-stack", params: ['ClusterName': "${clusterValue}", 'ImageUrl': "${taskDefImage}",'VPC': "${vpc}", 'TG': "${targetGroup}", 'Subnet1':"${subnet1}", 'Subnet2':"${subnet2}" 'BuildNumber':"${currentBuild.number}"],    url:'CF/service_new.yaml')   
+    } 
+    
+  }  
+
+}
+
+

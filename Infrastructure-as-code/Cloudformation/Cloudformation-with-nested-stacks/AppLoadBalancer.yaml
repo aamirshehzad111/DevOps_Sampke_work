@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Application LoadBalancer on 2 Application Server
+
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: customAPLB
+      Scheme: internet-facing
+      SecurityGroups: 
+        - !ImportValue customVPC-APLBSG
+      Subnets:
+        - !ImportValue customVPC-PublicSubnet01
+        - !ImportValue customVPC-PublicSubnet02
+      Tags:
+        - Key: Name
+          Value: customAPLB
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref DefaultTargetGroup
+
+
+  DefaultTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: "/StudentDataApp/"
+      HealthCheckPort: 'traffic-port'
+      HealthCheckProtocol: 'HTTP'
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Name: customTargetGroup
+      VpcId: !ImportValue customVPC-VPC
+      Port: 80
+      Protocol: HTTP
+      TargetType: 'instance'
+      Tags:
+        - Key: Name
+          Value: Target_01
+
+Outputs:
+  LoadBalancer:
+    Description: A reference to the Application Load Balancer
+    Value: !Ref LoadBalancer
+    Export:
+      Name: !Sub "AppLoadBalancer-LoadBalancer"
+
+  LoadBalancerUrl:
+    Description: The URL of the ALB
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: !Sub "AppLoadBalancer-LoadBalancerUrl"
+
+  TargetGroupName:
+    Description: A reference to a port 80 listener
+    Value: !Ref DefaultTargetGroup
+    Export:
+      Name: !Sub "AppLoadBalancer-DefaultTargetGroup"    

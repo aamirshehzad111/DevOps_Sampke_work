@@ -1,0 +1,22 @@
+#!/usr/bin/env groovy
+
+node {
+  stage 'Checkout'
+  git 'https://github.com/aamirshehzad111/jenkins-git.git'
+  
+  properties([
+      parameters(
+         [string(defaultValue: 'cluster-one', description: 'cluster name', name: 'cluster')] 
+      )
+
+  ]) 
+  
+  stage('Deploy'){
+   
+   withAWS(region:'us-east-1') {
+        def outputs = cfnUpdate(stack: "${cluster}-stack",params:['ClusterName': "${cluster}"], url:'CF/ecs_cluster.yaml')
+         
+    }
+  }
+
+}
