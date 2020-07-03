@@ -1,6 +1,6 @@
 These are the assignments that I have done during my training.
 
-* # Infrastructure as code:
+# Infrastructure as code:
     
    * CloudForamtion:
 
@@ -67,7 +67,7 @@ These are the assignments that I have done during my training.
         3- Running simple nginx image on fargate cluster using terraform. All configurations are similiar with few exceptions. Such as cluster required capabilties of fargate. Service launch type fargate and running with replica type.
 
 
-* # Deployments:
+# Deployments:
 
     * Docker:
 
@@ -85,7 +85,7 @@ These are the assignments that I have done during my training.
             * Service creation for the php and mysql
 
 
-* # CICD:
+# CICD:
 
     * Jenkins:
        
@@ -116,7 +116,7 @@ These are the assignments that I have done during my training.
 
 
 
-* # Serverless framework:
+## Serverless framework:
     
     * NodeJS Template is used.
     * simple NodeJS CRUD operation with DynmaDB.
