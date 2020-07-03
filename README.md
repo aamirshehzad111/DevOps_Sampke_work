@@ -37,7 +37,7 @@ These are the assignments that I have done during my training.
             * Application Load Balancer for service 
 
 
-    * **Terraform**:
+   * **Terraform**:
             
         1- AWS RDS Aurora Cluster deployment using terraform:
 
@@ -69,7 +69,7 @@ These are the assignments that I have done during my training.
 
 ## Deployments:
 
-    * **Docker**:
+   * **Docker**:
 
         1- Docker-compose to package and deploy a python and redis app with nginx:
 
@@ -77,7 +77,7 @@ These are the assignments that I have done during my training.
             * requirements.txt file to install requriements.
 
 
-    * **Kubernetes**:
+   * **Kubernetes**:
 
         1- Php and mysql application deployment with kubernetes:
 
@@ -87,7 +87,7 @@ These are the assignments that I have done during my training.
 
 ## CICD:
 
-    * **Jenkins**:
+   * **Jenkins**:
        
         1- Scripted pipeline for nginx application on ec2 cluster:
            
@@ -105,7 +105,7 @@ These are the assignments that I have done during my training.
            * pipeline with 3 stages, terraform init, terraform plan and terraform apply respectively.
          
 
-    * **AWS CodePipeline**:
+   * **AWS CodePipeline**:
 
         1- A simple student data gathering app using nodeJS and ExpressJS with template engine ejs. Created CI/CD for this application using AWS CodeDeploy and AWS CodePipline.  
 
